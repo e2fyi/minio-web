@@ -1,0 +1,11 @@
+{
+    "endpoint": "0.0.0.0",
+    "port": 9000,
+    "accessKeyID": "minio",
+    "secretAccessKey": "minio123",
+    "ssl": false,
+    "bucketName": "",
+    "defaultHtml": "index.html",
+    "favicon": "assets/favicon.ico",
+    "markdownTemplate": "assets/md-template.html"
+}

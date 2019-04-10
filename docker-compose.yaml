@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+
+  minio-web:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - MINIO_ENDPOINT=minio-store
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY_ID
+      - MINIO_SECRET_ACCESS_KEY
+      - MINIO_SSL=false
+      - MINIO_DEFAULT_HTML=index.html
+      - MINIO_FAVICON=assets/favicon.ico
+      - MINIO_MD_TEMPLATE=assets/md-template.html
+    depends_on:
+      - minio-store
+
+  minio-store:
+    image: minio/minio
+    ports:
+      - 9000:9000
+    expose:
+      - 9000
+    volumes:
+      - ./tmp:/daya
+    command:
+      - server
+      - /data
+    environment:
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=minio123
