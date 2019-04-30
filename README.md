@@ -3,13 +3,82 @@
 
 A web server proxy for any S3-compatible storage.
 
+## Quickstart
 
+### Environment variables
+
+```bash
+# where config file is located
+CONFIG_FILE_PATH=configs/config.json
+
+# port for minio-web to listen to
+SERVER_PORT=8080
+# path to ssl cert and key files
+SERVER_SSL_CERT=
+SERVER_SLL_KEY=
+
+# endpoint to call for the s3 compatible storage
+MINIO_ENDPOINT=s3.amazonaws.com
+# access key and secret key
+MINIO_ACCESSKEY=
+MINIO_SECRETKEY=
+# ssl when calling endpoint
+MINIO_SECURE=true
+# aws s3 bucket region (optional)
+MINIO_REGION=
+
+# Extensions #
+# bucket to serve if provided (http://minio-web/abc => endpoint/bucketname/abc)
+# if not provided (http://minio-web/abc/efg => endpoint/abc/efg) where abc is the bucket
+EXT_BUCKETNAME=
+
+# if provided a default index file is return 
+# i.e http://minio-web/abc/ => http://minio-web/abc/index.html
+EXT_DEFAULTHTML=index.html
+
+# if provided, returns a default favicon if backend does not have one.
+EXT_FAVICON=assets/favicon.ico
+
+# if provided, renders any markdown resources as HTML with the template.
+# template MUST have a placeholder {{ .Content }}
+EXT_MARKDOWNTEMPLATE=assets/md-template.html
+```
+
+### Config file
+
+```json
+{
+    "server": {
+        "port": 8080,
+        "ssl": {
+            "cert": "",
+            "key": ""
+        }
+    },
+    "minio": {
+        "endpoint": "s3.amazonaws.com",
+        "accesskey": "",
+        "secretkey": "",
+        "secure": false ,
+        "region": ""       
+    },
+    "ext": {
+        "bucketname": "",
+        "defaulthtml": "index.html",
+        "favicon": "assets/favicon.ico",
+        "markdowntemplate": "assets/md-template.html"
+    }
+}
+```
+
+
+### Run demo locally
 ```bash
 # starts a minio server
 ./scripts/start-minio-server.sh
 
 # starts minio-web service
-go run cmd/minio-web.go
+go run .
 ```
 
 Alternatively, with docker compose:
@@ -19,7 +88,7 @@ Alternatively, with docker compose:
 docker-compose up -d
 ```
 
-docker image:
+### Docker image
 ```bash
 # build locally
 docker build -t e2fyi/minio-web:latest .
@@ -30,17 +99,12 @@ docker pull e2fyi/minio-web:latest
 # run docker container
 docker run --rm -ti \
     -p 8080:8080 \
-    -e MINIO_ENDPOINT=s3.amazonaws.com \
-    -e MINIO_PORT=443 \
-    -e MINIO_SSL=true \
-    -e MINIO_ACCESS_KEY_ID=ABCD \
-    -e MINIO_SECRET_ACCESS_KEY=EFGH \
-    -e MINIO_BUCKET=FooBar \
+    --env-file .envfile \
     e2fyi/minio-web:latest
 ```
 
 
 ## GoDoc
 
-- [minio-web](https://godoc.org/github.com/e2fyi/minio-web/cmd)
+- [minio-web](https://godoc.org/github.com/e2fyi/minio-web/)
 - [github.com/e2fyi/minio-web/pkg](https://godoc.org/github.com/e2fyi/minio-web/pkg)

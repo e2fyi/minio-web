@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio-web
-  namespace: transport
   labels:
     app: minio-web
 spec:
@@ -12,6 +11,8 @@ spec:
       app: minio-web
   template:
     metadata:
+      annotations:
+        iam.amazonaws.com/role: foo.bar
       labels:
         app: minio-web
     spec:
@@ -19,14 +20,28 @@ spec:
       - name: minio-web
         image: e2fyi/minio-web:latest
         env:
+          - name: AWS_METADATA_SERVICE_TIMEOUT
+            value: "10"
+          - name: AWS_METADATA_SERVICE_NUM_ATTEMPTS
+            value: "20"
           - name: MINIO_ENDPOINT
             value: s3.amazonaws.com
-          - name: MINIO_PORT
-            value: "443"
-          - name: MINIO_SSL
+          - name: MINIO_SECURE
             value: "true"
-          - name: MINIO_BUCKET
+          - name: MINIO_ACCESSKEY
+            value: ""
+          - name: MINIO_SECRETKEY
+            value: ""
+          - name: MINIO_REGION
+            value: ap-southeast-1
+          - name: EXT_BUCKETNAME
             value: grab-ds-tmp
+          - name: EXT_DEFAULTHTML
+            value: index.html
+          - name: EXT_FAVICON
+            value: assets/favicon.ico
+          - name: EXT_MARKDOWNTEMPLATE
+            value: assets/md-template.html
         ports:
         - containerPort: 8080
         resources:
@@ -41,16 +56,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: minio-web
-  namespace: transport
   annotations:
     getambassador.io/config: |
       apiVersion: ambassador/v1
       kind:  Mapping
       name: minio-web
-      host: transport.grabds.lol
-      prefix: /docs
+      host: foo.bar
+      prefix: /
       rewrite: /
-      service: minio-web.transport
+      service: minio-web.default
 spec:
   ports:
   - port: 80

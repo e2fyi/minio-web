@@ -7,11 +7,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - MINIO_ENDPOINT=minio-store
-      - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY_ID
-      - MINIO_SECRET_ACCESS_KEY
-      - MINIO_SSL=false
+      - MINIO_ENDPOINT=minio-store:9000
+      - MINIO_ACCESS_KEY_ID=minio
+      - MINIO_SECRET_ACCESS_KEY=minio123
+      - MINIO_SECURE=false
       - MINIO_DEFAULT_HTML=index.html
       - MINIO_FAVICON=assets/favicon.ico
       - MINIO_MD_TEMPLATE=assets/md-template.html

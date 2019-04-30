@@ -56,16 +56,20 @@ func (r *Resource) FromGob(data []byte) error {
 	return err
 }
 
-// NewCache creates a new gCache instance.
-func NewCache(NumCached int, MaxSizeCached int64) *Cache {
+// CacheRequests installs the extension to cache all GetObject requests to
+// the S3 compatible backend.
+func (app *App) CacheRequests(NumCached int, MaxSizeCached int64) *App {
 	gob.Register(CachableResource{})
 
 	cache := gcache.New(NumCached).
 		ARC().
-		Expiration(time.Hour).
+		Expiration(5 * time.Minute).
 		Build()
 
-	return &Cache{NumCached: NumCached, MaxSizeCached: MaxSizeCached, cache: cache}
+	cacher := &Cache{NumCached: NumCached, MaxSizeCached: MaxSizeCached, cache: cache}
+	app.handler.GetObject = cacher.GetObjectCache(app.handler.GetObject)
+	app.sugar.Info("caching: enabled")
+	return app
 }
 
 // GetObjectCache decorates a GetObject function to check the cache before
@@ -96,7 +100,7 @@ func (h *Cache) GetObjectCache(GetObject func(url string) (Resource, error)) fun
 		if h.MaxSizeCached > 0 && res.Info.Size < h.MaxSizeCached {
 			serialized, err := res.ToGob()
 			if err == nil {
-				h.cache.SetWithExpire(url, serialized, time.Hour)
+				h.cache.SetWithExpire(url, serialized, 5*time.Minute)
 				log.Printf("saving to %s cache.", url)
 			} else {
 				log.Printf("Unable to serialize resource[%s]: %s", url, err.Error())

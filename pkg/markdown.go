@@ -21,11 +21,12 @@ type TemplateData struct {
 	Content template.HTML
 }
 
-// NewMarkdown creates a new Markdown from a HTML template file.
-func NewMarkdown(templateFile string) (Markdown, error) {
+// RenderMarkdowns installs the markdown extension if a template is provided.
+func (app *App) RenderMarkdowns(templateFile string) *App {
 	template, err := template.ParseFiles(templateFile)
 	if err != nil {
-		return Markdown{}, err
+		app.sugar.Error(err)
+		return app
 	}
 
 	md := markdown.New(
@@ -35,7 +36,10 @@ func NewMarkdown(templateFile string) (Markdown, error) {
 		markdown.Typographer(true),
 		markdown.XHTMLOutput(true))
 
-	return Markdown{template: template, md: md}, nil
+	ext := Markdown{template: template, md: md}
+	app.handler.Serve = ext.RenderMarkdown(app.handler.Serve)
+
+	return app
 }
 
 // isMarkdown checks whether a resource content type is a markdown.

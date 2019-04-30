@@ -12,12 +12,17 @@ type IndexHTML struct {
 	filename string
 }
 
-// NewIndexHTML creates a new IndexHTML object.
-func NewIndexHTML(filename string) IndexHTML {
+// InsertIndexFile installs the extension where a default index file is queried
+// if not provided in the url (e.g. http://abc instead of http://abc/efg.html).
+func (app *App) InsertIndexFile(filename string) *App {
 	if filename == "" {
 		filename = "index.html"
 	}
-	return IndexHTML{filename: filename}
+	ext := IndexHTML{filename: filename}
+	app.handler.StatObject = ext.GetIndexHTML(app.handler.StatObject)
+	app.handler.GetObject = ext.GetIndexHTML(app.handler.GetObject)
+	app.sugar.Infof("default index file: %s", filename)
+	return app
 }
 
 // insertIfNeeded inserts the default index file into the url if needed (e.g.

@@ -5,6 +5,7 @@ package pkg
 import (
 	"errors"
 	"github.com/minio/minio-go"
+	"github.com/minio/minio-go/pkg/credentials"
 	"io"
 	"strings"
 )
@@ -13,6 +14,61 @@ import (
 type MinioHelper struct {
 	Client     *minio.Client
 	BucketName string
+}
+
+// ConfigMinioHelper creates a internal helper to interact with the S3
+// compatible backend.
+func (app *App) ConfigMinioHelper(config MinioConfig, bucketName string) *App {
+	// create client
+	client, err := NewMinioClient(config)
+	if err != nil {
+		app.sugar.Fatal(err)
+	}
+
+	// test connection
+	app.sugar.Infof("connecting to %s", config.Endpoint)
+	if bucketName != "" {
+		exist, err := client.BucketExists(bucketName)
+		if err != nil {
+			app.sugar.Fatal(err)
+		}
+		app.sugar.Infof("bucket %s: %t", bucketName, exist)
+	} else {
+		buckets, err := client.ListBuckets()
+		if err != nil {
+			app.sugar.Fatal(err)
+		}
+		app.sugar.Infof("# buckets found: %d", len(buckets))
+	}
+
+	// create helper
+	app.helper = MinioHelper{Client: client, BucketName: bucketName}
+	app.handler.GetObject = app.helper.GetObject
+	app.handler.StatObject = app.helper.StatObject
+	return app
+}
+
+// NewMinioClient creates a new minio client. If accesskey and secretkey are 
+// provided, they are used to create the client. Otherwise, AWS EC2 IAM role
+// credentials will be used instead. 
+func NewMinioClient(config MinioConfig) (*minio.Client, error) {
+	if config.AccessKey == "" && config.SecretKey == "" {
+		return minio.NewWithCredentials(config.Endpoint, 
+										credentials.NewIAM(""), 
+										config.Secure, 
+										config.Region)
+	}
+	if config.Region == "" {
+		return minio.NewWithRegion(config.Endpoint, 
+								   config.AccessKey, 
+								   config.SecretKey, 
+								   config.Secure, 
+								   config.Region)
+	}
+	return minio.New(config.Endpoint, 
+					 config.AccessKey, 
+				 	 config.SecretKey, 
+				 	 config.Secure)
 }
 
 // minioObjectInfoToResourceInfo converts a minio ObjectInfo to ResourceInfo.

@@ -14,13 +14,16 @@ type Favicon struct {
 	data []byte
 }
 
-// NewFaviconFromFile creates a Favicon from a file.
-func NewFaviconFromFile(filepath string) (*Favicon, error) {
+// SetDefaultFavicon returns a default favicon if backend does not have one.
+func (app *App) SetDefaultFavicon(filepath string) *App {
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		return &Favicon{}, err
+		app.sugar.Error(err)
+		return app
 	}
-	return &Favicon{data}, nil
+	favicon := &Favicon{data}
+	app.handler.GetObject = favicon.GetDefaultFavicon(app.handler.GetObject)
+	return app
 }
 
 // isGettingFavicon checks whether an url is requesting for a favicon.
