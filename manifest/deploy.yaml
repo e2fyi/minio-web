@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-web
+  namespace: transport
+  labels:
+    app: minio-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-web
+  template:
+    metadata:
+      labels:
+        app: minio-web
+    spec:
+      containers:
+      - name: minio-web
+        image: e2fyi/minio-web:latest
+        env:
+          - name: MINIO_ENDPOINT
+            value: s3.amazonaws.com
+          - name: MINIO_PORT
+            value: "443"
+          - name: MINIO_SSL
+            value: "true"
+          - name: MINIO_BUCKET
+            value: grab-ds-tmp
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "100m"
+          limits:
+            memory: "8Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-web
+  namespace: transport
+  annotations:
+    getambassador.io/config: |
+      apiVersion: ambassador/v1
+      kind:  Mapping
+      name: minio-web
+      host: transport.grabds.lol
+      prefix: /docs
+      rewrite: /
+      service: minio-web.transport
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: minio-web

@@ -14,7 +14,7 @@ FROM alpine:latest as dist
 
 WORKDIR /goapp
 
-RUN apk --no-cache add su-exec
+RUN apk --no-cache add su-exec ca-certificates
 
 COPY --from=builder /goapp/minio-web  /goapp/minio-web
 COPY assets/ assets/
