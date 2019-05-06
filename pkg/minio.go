@@ -8,12 +8,15 @@ import (
 	"github.com/minio/minio-go/pkg/credentials"
 	"io"
 	"strings"
+	"fmt"
+	"time"
 )
 
 // MinioHelper provides the interface to the S3 compatible backend.
 type MinioHelper struct {
-	Client     *minio.Client
-	BucketName string
+	Client     	*minio.Client
+	BucketName 	string
+	maxAttempts int
 }
 
 // ConfigMinioHelper creates a internal helper to interact with the S3
@@ -25,24 +28,24 @@ func (app *App) ConfigMinioHelper(config MinioConfig, bucketName string) *App {
 		app.sugar.Fatal(err)
 	}
 
-	// test connection
+	helper := MinioHelper{Client: client, BucketName: bucketName, maxAttempts: 5}
+
+	// try connection for 5 times before throwing error
 	app.sugar.Infof("connecting to %s", config.Endpoint)
-	if bucketName != "" {
-		exist, err := client.BucketExists(bucketName)
-		if err != nil {
-			app.sugar.Fatal(err)
+	for i := 1;  i<=5; i++ {
+		msg, err := helper.testConnection()
+		if err == nil {
+			app.sugar.Info(msg)
+			break
 		}
-		app.sugar.Infof("bucket %s: %t", bucketName, exist)
-	} else {
-		buckets, err := client.ListBuckets()
-		if err != nil {
-			app.sugar.Fatal(err)
-		}
-		app.sugar.Infof("# buckets found: %d", len(buckets))
+		time.Sleep(1 * time.Second)
+	}
+	if err != nil {
+		app.sugar.Fatal(err)
 	}
 
 	// create helper
-	app.helper = MinioHelper{Client: client, BucketName: bucketName}
+	app.helper = helper
 	app.handler.GetObject = app.helper.GetObject
 	app.handler.StatObject = app.helper.StatObject
 	return app
@@ -78,6 +81,18 @@ func minioObjectInfoToResourceInfo(info minio.ObjectInfo) ResourceInfo {
 		ETag:         info.ETag,
 		LastModified: info.LastModified,
 		ContentType:  info.ContentType}
+}
+
+// test connection to backend
+func (h *MinioHelper) testConnection() (string, error) {
+	// test connection
+	if h.BucketName != "" {
+		exist, err := h.Client.BucketExists(h.BucketName)
+		return fmt.Sprintf("bucket %s: %t", h.BucketName, exist), err
+	} 
+
+	buckets, err := h.Client.ListBuckets()
+	return fmt.Sprintf("# buckets found: %d", len(buckets)), err
 }
 
 // GetBucketNameAndPrefix infers the bucket name and prefix from the url.

@@ -2,10 +2,11 @@
 package pkg
 
 import (
+	"os"
+
 	"github.com/micro/go-config"
 	"github.com/micro/go-config/source/env"
 	"github.com/micro/go-config/source/file"
-	"os"
 )
 
 // Configuration is global configuration object.
