@@ -1,8 +1,7 @@
-// Package pkg provides utils to return a default index file if not provided
-// in the url request.
-package pkg
+package ext
 
 import (
+	"fmt"
 	"path"
 )
 
@@ -12,17 +11,29 @@ type IndexHTML struct {
 	filename string
 }
 
-// InsertIndexFile installs the extension where a default index file is queried
+// DefaultIndexFileExtension installs the extension where a default index file
+// is queried if not provided in the url
+// (e.g. http://abc instead of http://abc/efg.html).
+func DefaultIndexFileExtension(filename string) Extension {
+	return func(c *Core) (string, error) {
+		if filename == "" {
+			filename = "index.html"
+		}
+		decorator := GetIndexFileDecorator(filename)
+		c.ApplyStatObject(decorator)
+		c.ApplyGetObject(decorator)
+		return fmt.Sprintf("default index file: %s", filename), nil
+	}
+}
+
+// GetIndexFileDecorator installs the extension where a default index file is queried
 // if not provided in the url (e.g. http://abc instead of http://abc/efg.html).
-func (app *App) InsertIndexFile(filename string) *App {
+func GetIndexFileDecorator(filename string) HandlerDecorator {
 	if filename == "" {
 		filename = "index.html"
 	}
 	ext := IndexHTML{filename: filename}
-	app.handler.StatObject = ext.GetIndexHTML(app.handler.StatObject)
-	app.handler.GetObject = ext.GetIndexHTML(app.handler.GetObject)
-	app.sugar.Infof("default index file: %s", filename)
-	return app
+	return ext.GetIndexHTML
 }
 
 // insertIfNeeded inserts the default index file into the url if needed (e.g.
@@ -42,13 +53,13 @@ func (i IndexHTML) insertIfNeeded(url string) (updatedURL string, unchanged bool
 
 // GetIndexHTML decorates a GetObject or StatObject function to insert the
 // default index file if required.
-func (i IndexHTML) GetIndexHTML(GetObjectOrStat func(url string) (Resource, error)) func(url string) (Resource, error) {
+func (i IndexHTML) GetIndexHTML(handler Handler) Handler {
 
 	return func(url string) (Resource, error) {
 		updatedURL, unchanged := i.insertIfNeeded(url)
-		resource, error := GetObjectOrStat(updatedURL)
+		resource, error := handler(updatedURL)
 		if error != nil && unchanged {
-			return GetObjectOrStat(path.Join(url, i.filename))
+			return handler(path.Join(url, i.filename))
 		}
 		return resource, error
 	}

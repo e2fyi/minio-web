@@ -1,13 +1,13 @@
-// Package pkg provides utils to render a Markdown resource as HTML.
-package pkg
+package ext
 
 import (
 	"bytes"
-	"gitlab.com/golang-commonmark/markdown"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"gitlab.com/golang-commonmark/markdown"
 )
 
 // Markdown provides the decorator to serve markdowns as HMTL.
@@ -21,12 +21,24 @@ type TemplateData struct {
 	Content template.HTML
 }
 
-// RenderMarkdowns installs the markdown extension if a template is provided.
-func (app *App) RenderMarkdowns(templateFile string) *App {
+// RenderMarkdownExtension installs the markdown extension if a template is
+// provided.
+func RenderMarkdownExtension(templateFile string) Extension {
+	return func(c *Core) (string, error) {
+		decorator, err := getMarkdownDecorator(templateFile)
+		if err != nil {
+			return "markdown rendering: errored", err
+		}
+		c.ApplyServe(decorator)
+		return "markdown rendering: enabled", nil
+	}
+}
+
+// getMarkdownDecorator returns a ServeHandlerDecorator.
+func getMarkdownDecorator(templateFile string) (ServeHandlerDecorator, error) {
 	template, err := template.ParseFiles(templateFile)
 	if err != nil {
-		app.sugar.Error(err)
-		return app
+		return nil, err
 	}
 
 	md := markdown.New(
@@ -37,19 +49,17 @@ func (app *App) RenderMarkdowns(templateFile string) *App {
 		markdown.XHTMLOutput(true))
 
 	ext := Markdown{template: template, md: md}
-	app.handler.Serve = ext.RenderMarkdown(app.handler.Serve)
-
-	return app
+	return ext.RenderMarkdown, nil
 }
 
 // isMarkdown checks whether a resource content type is a markdown.
 func isMarkdown(resource Resource) bool {
-	return strings.Contains(strings.ToLower(resource.Info.ContentType), "markdown")
+	return strings.Contains(strings.ToLower(resource.Info.ContentType), "markdown") || strings.HasSuffix(strings.ToLower(resource.Info.Key), ".md")
 }
 
 // RenderMarkdown decorates a Serve function to render and return a HTML
 // resource from a markdown resource.
-func (m Markdown) RenderMarkdown(Serve func(http.ResponseWriter, Resource) error) func(http.ResponseWriter, Resource) error {
+func (m Markdown) RenderMarkdown(Serve ServeHandler) ServeHandler {
 
 	return func(w http.ResponseWriter, resource Resource) error {
 		if !isMarkdown(resource) {
@@ -63,6 +73,7 @@ func (m Markdown) RenderMarkdown(Serve func(http.ResponseWriter, Resource) error
 		}
 
 		rendered := m.md.RenderToString(content)
+		resource.Info.Size = int64(len(rendered))
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = m.template.Execute(w, TemplateData{Content: template.HTML(rendered)})

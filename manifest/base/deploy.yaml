@@ -11,8 +11,6 @@ spec:
       app: minio-web
   template:
     metadata:
-      annotations:
-        iam.amazonaws.com/role: foo.bar
       labels:
         app: minio-web
     spec:
@@ -42,6 +40,10 @@ spec:
             value: assets/favicon.ico
           - name: EXT_MARKDOWNTEMPLATE
             value: assets/md-template.html
+          - name: EXT_LISTFOLDER
+            value: "true"
+          - name: EXT_LISTFOLDEROBJECTS
+            value: "false"
         ports:
         - containerPort: 8080
         resources:
@@ -51,23 +53,3 @@ spec:
           limits:
             memory: "8Gi"
             cpu: "1000m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio-web
-  annotations:
-    getambassador.io/config: |
-      apiVersion: ambassador/v1
-      kind:  Mapping
-      name: minio-web
-      host: foo.bar
-      prefix: /
-      rewrite: /
-      service: minio-web.default
-spec:
-  ports:
-  - port: 80
-    targetPort: 8080
-  selector:
-    app: minio-web

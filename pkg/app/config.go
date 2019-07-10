@@ -1,5 +1,4 @@
-// Package pkg provides utils to configure the web server.
-package pkg
+package app
 
 import (
 	"os"
@@ -28,22 +27,15 @@ type SSLConfig struct {
 	Key  string `json:"key"`
 }
 
-// MinioConfig is used to create a minio client.
-type MinioConfig struct {
-	Endpoint  string `json:"endpoint"`
-	AccessKey string `json:"accesskey"`
-	SecretKey string `json:"secretkey"`
-	Secure    bool   `json:"secure"`
-	Region    string `json:"region"`
-}
-
 // ExtensionsConfig is used to config the extensions to install on minio-web.
 type ExtensionsConfig struct {
-	BucketName       string `json:"bucketname"`
-	DefaultHTML      string `json:"defaulthtml"`
-	FavIcon          string `json:"favicon"`
-	CacheSize        int    `json:"cachesize"`
-	MarkdownTemplate string `json:"markdowntemplate"`
+	BucketName        string `json:"bucketname"`
+	DefaultHTML       string `json:"defaulthtml"`
+	FavIcon           string `json:"favicon"`
+	CacheSize         int    `json:"cachesize"`
+	MarkdownTemplate  string `json:"markdowntemplate"`
+	ListFolder        bool   `json:"listfolder"`
+	ListFolderObjects bool   `json:"listfolderobjects"`
 }
 
 // configFilePath returns the location of the config file.
@@ -56,7 +48,7 @@ func configFilePath() string {
 }
 
 // LoadConfig loads the config from both file and environment variables.
-func (app *App) LoadConfig() *App {
+func LoadConfig() (Configuration, error) {
 	// load from file
 	conf := config.NewConfig()
 	err := conf.Load(
@@ -68,8 +60,7 @@ func (app *App) LoadConfig() *App {
 	var configuration Configuration
 	err = conf.Scan(&configuration)
 	if err != nil {
-		app.sugar.Fatal(err)
+		return Configuration{}, err
 	}
-	app.Config = configuration
-	return app
+	return configuration, nil
 }

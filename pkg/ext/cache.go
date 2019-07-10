@@ -1,13 +1,14 @@
-// Package pkg provides utils for caching behaviors.
-package pkg
+package ext
 
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/bluele/gcache"
 	"io/ioutil"
 	"log"
 	"time"
+
+	"github.com/bluele/gcache"
+	core "github.com/e2fyi/minio-web/pkg/core"
 )
 
 // Cache is use to initialize a gCache (https://github.com/bluele/gcache)
@@ -30,8 +31,30 @@ type CachableResource struct {
 	Info ResourceInfo
 }
 
-// ToGob converts the Resource into a CachableResource and serialized as a Gob.
-func (r *Resource) ToGob() ([]byte, error) {
+// CacheRequestsExtension installs the extension to cache all GetObject requests to
+// the S3 compatible backend.
+func CacheRequestsExtension(NumCached int, MaxSizeCached int64) Extension {
+	return func(c *Core) (string, error) {
+		cacher := NewCache(NumCached, MaxSizeCached)
+		c.ApplyGetObject(cacher.getObjectCache)
+		return "caching: enabled", nil
+	}
+}
+
+// NewCache creates a new Cache object.
+func NewCache(NumCached int, MaxSizeCached int64) *Cache {
+	gob.Register(CachableResource{})
+
+	cache := gcache.New(NumCached).
+		ARC().
+		Expiration(5 * time.Minute).
+		Build()
+
+	return &Cache{NumCached: NumCached, MaxSizeCached: MaxSizeCached, cache: cache}
+}
+
+// toGob converts the Resource into a CachableResource and serialized as a Gob.
+func toGob(r *core.Resource) ([]byte, error) {
 	b := bytes.Buffer{}
 	e := gob.NewEncoder(&b)
 	data, err := ioutil.ReadAll(r.Data)
@@ -43,9 +66,9 @@ func (r *Resource) ToGob() ([]byte, error) {
 	return b.Bytes(), err
 }
 
-// FromGob converts raw bytes into a CachableResource, which is converted back
+// fromGob converts raw bytes into a CachableResource, which is converted back
 // into a Resource.
-func (r *Resource) FromGob(data []byte) error {
+func fromGob(r *core.Resource, data []byte) error {
 	d := gob.NewDecoder(bytes.NewReader(data))
 	cache := CachableResource{}
 	err := d.Decode(&cache)
@@ -56,25 +79,9 @@ func (r *Resource) FromGob(data []byte) error {
 	return err
 }
 
-// CacheRequests installs the extension to cache all GetObject requests to
-// the S3 compatible backend.
-func (app *App) CacheRequests(NumCached int, MaxSizeCached int64) *App {
-	gob.Register(CachableResource{})
-
-	cache := gcache.New(NumCached).
-		ARC().
-		Expiration(5 * time.Minute).
-		Build()
-
-	cacher := &Cache{NumCached: NumCached, MaxSizeCached: MaxSizeCached, cache: cache}
-	app.handler.GetObject = cacher.GetObjectCache(app.handler.GetObject)
-	app.sugar.Info("caching: enabled")
-	return app
-}
-
-// GetObjectCache decorates a GetObject function to check the cache before
+// getObjectCache decorates a Handler function to check the cache before
 // actually retrieving the object from the S3 compatible store.
-func (h *Cache) GetObjectCache(GetObject func(url string) (Resource, error)) func(url string) (Resource, error) {
+func (h *Cache) getObjectCache(GetObject Handler) Handler {
 
 	return func(url string) (Resource, error) {
 
@@ -85,7 +92,7 @@ func (h *Cache) GetObjectCache(GetObject func(url string) (Resource, error)) fun
 				res := Resource{}
 				data, ok := unknown.([]byte)
 				if ok {
-					res.FromGob(data)
+					fromGob(&res, data)
 					return res, nil
 				}
 			}
@@ -98,7 +105,7 @@ func (h *Cache) GetObjectCache(GetObject func(url string) (Resource, error)) fun
 
 		// serialize and cache if file is not very big
 		if h.MaxSizeCached > 0 && res.Info.Size < h.MaxSizeCached {
-			serialized, err := res.ToGob()
+			serialized, err := toGob(&res)
 			if err == nil {
 				h.cache.SetWithExpire(url, serialized, 5*time.Minute)
 				log.Printf("saving to %s cache.", url)

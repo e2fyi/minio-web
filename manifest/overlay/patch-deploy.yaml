@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-web
+spec:
+  template:
+    metadata:
+      annotations:
+        iam.amazonaws.com/role: $(minio-web-aws-iam-arn)
+    spec:
+      containers:
+      - name: minio-web
+        env:
+          - name: AWS_METADATA_SERVICE_TIMEOUT
+            value: $(AWS_METADATA_SERVICE_TIMEOUT)
+          - name: AWS_METADATA_SERVICE_NUM_ATTEMPTS
+            value: $(AWS_METADATA_SERVICE_NUM_ATTEMPTS)
+          - name: MINIO_ENDPOINT
+            value: $(MINIO_ENDPOINT)
+          - name: MINIO_SECURE
+            value: $(MINIO_SECURE)
+          - name: MINIO_ACCESSKEY
+            value: $(MINIO_ACCESSKEY)
+          - name: MINIO_SECRETKEY
+            value: $(MINIO_SECRETKEY)
+          - name: MINIO_REGION
+            value: $(MINIO_REGION)
+          - name: EXT_BUCKETNAME
+            value: $(EXT_BUCKETNAME)
+          - name: EXT_DEFAULTHTML
+            value: $(EXT_DEFAULTHTML)
+          - name: EXT_FAVICON
+            value: $(EXT_FAVICON)
+          - name: EXT_MARKDOWNTEMPLATE
+            value: $(EXT_MARKDOWNTEMPLATE)
+          - name: EXT_LISTFOLDER
+            value: $(EXT_LISTFOLDER)
+          - name: EXT_LISTFOLDEROBJECTS
+            value: $(EXT_LISTFOLDEROBJECTS)

@@ -1,0 +1,8 @@
+apiVersion: getambassador.io/v1
+kind: Mapping
+metadata:
+  name: $(minio-web-namespace)-minio-web
+spec:
+  host: $(minio-web-host)
+  prefix: /
+  service: $(minio-web-service).$(minio-web-namespace)

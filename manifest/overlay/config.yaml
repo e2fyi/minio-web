@@ -1,0 +1,13 @@
+varReference:
+- path: metadata/name
+  kind: Mapping
+- path: metadata/namespace
+  kind: Mapping
+- path: spec/host
+  kind: Mapping
+- path: spec/service
+  kind: Mapping
+- path: spec/template/spec/containers/env/value
+  kind: Deployment
+- path: spec/template/metadata/annotations
+  kind: Deployment

@@ -1,0 +1,164 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configurations:
+  - config.yaml
+
+bases:
+- ../base
+
+resources:
+- mapping.yaml
+
+patchesStrategicMerge:
+- patch-deploy.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: minio-web-params
+  envs: 
+  - params.env
+
+namespace: default
+
+commonLabels:
+  app: minio-web
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/name: minio-web
+
+vars:
+- name: minio-web-service
+  objref:
+    kind: Service
+    name: minio-web
+    apiVersion: v1
+  fieldref:
+    fieldpath: metadata.name
+- name: minio-web-namespace
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: metadata.namespace    
+- name: minio-web-aws-iam-arn
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.minio-web-aws-iam-arn
+- name: minio-web-host
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.minio-web-host
+- name: CONFIG_FILE_PATH
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.CONFIG_FILE_PATH
+- name: SERVER_PORT
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.SERVER_PORT
+- name: SERVER_SSL_CERT
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.SERVER_SSL_CERT
+- name: SERVER_SLL_KEY
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.SERVER_SLL_KEY
+- name: MINIO_ENDPOINT
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.MINIO_ENDPOINT
+- name: MINIO_ACCESSKEY
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.MINIO_ACCESSKEY
+- name: MINIO_SECRETKEY
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.MINIO_SECRETKEY
+- name: MINIO_SECURE
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.MINIO_SECURE
+- name: MINIO_REGION
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.MINIO_REGION
+- name: EXT_BUCKETNAME
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.EXT_BUCKETNAME
+- name: EXT_DEFAULTHTML
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.EXT_DEFAULTHTML
+- name: EXT_FAVICON
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.EXT_FAVICON
+- name: EXT_MARKDOWNTEMPLATE
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.EXT_MARKDOWNTEMPLATE
+- name: EXT_LISTFOLDER
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.EXT_LISTFOLDER
+- name: EXT_LISTFOLDEROBJECTS
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.EXT_LISTFOLDEROBJECTS    

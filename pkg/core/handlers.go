@@ -1,5 +1,4 @@
-// Package pkg provides utils to handles requests with different methods.
-package pkg
+package core
 
 import (
 	"io"
@@ -10,6 +9,7 @@ import (
 
 // ResourceInfo describes the metadata of the resource.
 type ResourceInfo struct {
+	Key          string
 	Size         int64
 	ETag         string
 	ContentType  string
@@ -29,9 +29,28 @@ type Resource struct {
 type Handlers struct {
 	StatObject func(url string) (Resource, error)
 	GetObject  func(url string) (Resource, error)
+	ListFolder func(url string) (Resource, error)
 	SetHeaders func(w http.ResponseWriter, info ResourceInfo)
 	Serve      func(w http.ResponseWriter, r Resource) error
 }
+
+// Handler is a returns a Resource with a provided url.
+type Handler = func(url string) (Resource, error)
+
+// HandlerDecorator decorates a Handler.
+type HandlerDecorator = func(Handler) Handler
+
+// ServeHandler handles the serving of a resource.
+type ServeHandler = func(w http.ResponseWriter, r Resource) error
+
+// ServeHandlerDecorator decorates a ServeHandler.
+type ServeHandlerDecorator = func(ServeHandler) ServeHandler
+
+// HeaderHandler handles the response header with the provided resource info.
+type HeaderHandler = func(w http.ResponseWriter, info ResourceInfo)
+
+// HeaderHandlerDecorator decorates a HeaderHandler.
+type HeaderHandlerDecorator = func(HeaderHandler) HeaderHandler
 
 // SetDefaultHeaders set headers for the http response.
 func SetDefaultHeaders(w http.ResponseWriter, info ResourceInfo) {
@@ -55,6 +74,7 @@ func (h *Handlers) Handler() func(w http.ResponseWriter, r *http.Request) {
 	if h.SetHeaders == nil {
 		h.SetHeaders = SetDefaultHeaders
 	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "HEAD":
@@ -93,6 +113,7 @@ func (h *Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
 	h.SetHeaders(w, res.Info)
 	err = h.Serve(w, res)
 	if err != nil {
+		log.Printf("Serve: %s", err)
 		w.Header().Set("Status-Code", "500")
 		w.Write([]byte(err.Error()))
 	}

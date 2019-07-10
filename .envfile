@@ -11,3 +11,5 @@ EXT_BUCKETNAME=
 EXT_DEFAULTHTML=index.html
 EXT_FAVICON=assets/favicon.ico
 EXT_MARKDOWNTEMPLATE=assets/md-template.html
+EXT_LISTFOLDER=true
+EXT_LISTFOLDEROBJECTS=false

@@ -1,0 +1,8 @@
+resources:
+- deploy.yaml
+- service.yaml
+
+commonLabels:
+  app: minio-web
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/name: minio-web

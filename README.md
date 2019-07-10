@@ -39,6 +39,11 @@ EXT_DEFAULTHTML=index.html
 # if provided, returns a default favicon if backend does not have one.
 EXT_FAVICON=assets/favicon.ico
 
+# if set, list the folders inside a folder
+EXT_LISTFOLDER=true
+# if set, list all objects inside a folder, otherwise only list folders
+EXT_LISTFOLDEROBJECTS=false
+
 # if provided, renders any markdown resources as HTML with the template.
 # template MUST have a placeholder {{ .Content }}
 EXT_MARKDOWNTEMPLATE=assets/md-template.html
@@ -66,11 +71,12 @@ EXT_MARKDOWNTEMPLATE=assets/md-template.html
         "bucketname": "",
         "defaulthtml": "index.html",
         "favicon": "assets/favicon.ico",
-        "markdowntemplate": "assets/md-template.html"
+        "markdowntemplate": "assets/md-template.html",
+        "listfolder": true,
+        "listfolderobjects": false
     }
 }
 ```
-
 
 ### Run demo locally
 ```bash
@@ -103,8 +109,14 @@ docker run --rm -ti \
     e2fyi/minio-web:latest
 ```
 
+## Kubernetes deployment (Kustomize)
+[kustomize](https://github.com/kubernetes-sigs/kustomize) k8s manifest for 
+`minio-web` can be found in [manifest/](./manifest).
 
 ## GoDoc
 
 - [minio-web](https://godoc.org/github.com/e2fyi/minio-web/)
-- [github.com/e2fyi/minio-web/pkg](https://godoc.org/github.com/e2fyi/minio-web/pkg)
+- [github.com/e2fyi/minio-web/pkg/app](https://godoc.org/github.com/e2fyi/minio-web/pkg/app)
+- [github.com/e2fyi/minio-web/pkg/core](https://godoc.org/github.com/e2fyi/minio-web/pkg/core)
+- [github.com/e2fyi/minio-web/pkg/minio](https://godoc.org/github.com/e2fyi/minio-web/pkg/minio)
+- [github.com/e2fyi/minio-web/pkg/ext](https://godoc.org/github.com/e2fyi/minio-web/pkg/ext)
