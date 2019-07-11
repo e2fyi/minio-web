@@ -10,8 +10,11 @@ replace github.com/testcontainers/testcontainer-go => github.com/testcontainers/
 
 require (
 	github.com/bluele/gcache v0.0.0-20190301044115-79ae3b2d8680
+	github.com/dustin/go-humanize v1.0.0
 	github.com/go-ini/ini v1.42.0 // indirect
+	github.com/gobwas/glob v0.2.3
 	github.com/micro/go-config v1.1.0
+	github.com/micro/go-micro v1.7.0
 	github.com/minio/minio-go v6.0.14+incompatible
 	gitlab.com/golang-commonmark/html v0.0.0-20180917080848-cfaf75183c4a // indirect
 	gitlab.com/golang-commonmark/linkify v0.0.0-20180917065525-c22b7bdb1179 // indirect

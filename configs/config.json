@@ -15,10 +15,10 @@
     },
     "ext": {
         "bucketname": "",
-        "defaulthtml": "index.html",
+        "defaulthtml": "index.html,README.md",
         "favicon": "assets/favicon.ico",
         "markdowntemplate": "assets/md-template.html",
         "listfolder": true,
-        "listfolderobjects": false        
+        "listfolderobjects": "*.md"        
     }
 }

@@ -2,10 +2,11 @@ package app
 
 import (
 	"os"
+	"strings"
 
-	"github.com/micro/go-config"
-	"github.com/micro/go-config/source/env"
-	"github.com/micro/go-config/source/file"
+	"github.com/micro/go-micro/config"
+	"github.com/micro/go-micro/config/source/env"
+	"github.com/micro/go-micro/config/source/file"
 )
 
 // Configuration is global configuration object.
@@ -31,11 +32,12 @@ type SSLConfig struct {
 type ExtensionsConfig struct {
 	BucketName        string `json:"bucketname"`
 	DefaultHTML       string `json:"defaulthtml"`
+	DefaultHTMLs      []string
 	FavIcon           string `json:"favicon"`
 	CacheSize         int    `json:"cachesize"`
 	MarkdownTemplate  string `json:"markdowntemplate"`
 	ListFolder        bool   `json:"listfolder"`
-	ListFolderObjects bool   `json:"listfolderobjects"`
+	ListFolderObjects string `json:"listfolderobjects"`
 }
 
 // configFilePath returns the location of the config file.
@@ -62,5 +64,8 @@ func LoadConfig() (Configuration, error) {
 	if err != nil {
 		return Configuration{}, err
 	}
+	configuration.Ext.DefaultHTMLs = strings.Split(
+		strings.ReplaceAll(configuration.Ext.DefaultHTML, " ", ""),
+		",")
 	return configuration, nil
 }

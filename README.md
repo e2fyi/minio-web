@@ -32,9 +32,9 @@ MINIO_REGION=
 # if not provided (http://minio-web/abc/efg => endpoint/abc/efg) where abc is the bucket
 EXT_BUCKETNAME=
 
-# if provided a default index file is return 
+# if provided a list of default index files to return 
 # i.e http://minio-web/abc/ => http://minio-web/abc/index.html
-EXT_DEFAULTHTML=index.html
+EXT_DEFAULTHTML=index.html,README.md
 
 # if provided, returns a default favicon if backend does not have one.
 EXT_FAVICON=assets/favicon.ico
@@ -69,7 +69,7 @@ EXT_MARKDOWNTEMPLATE=assets/md-template.html
     },
     "ext": {
         "bucketname": "",
-        "defaulthtml": "index.html",
+        "defaulthtml": "index.html,README.md",
         "favicon": "assets/favicon.ico",
         "markdowntemplate": "assets/md-template.html",
         "listfolder": true,

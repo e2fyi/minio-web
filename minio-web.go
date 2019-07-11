@@ -14,7 +14,7 @@ func main() {
 	// config backend
 	app.ConfigMinioHelper(app.Config.Minio, app.Config.Ext.BucketName)
 	// install default index file extension
-	app.ApplyExtension(ext.DefaultIndexFileExtension(app.Config.Ext.DefaultHTML))
+	app.ApplyExtension(ext.DefaultIndexFileExtension(app.Config.Ext.DefaultHTMLs...))
 	// install default favicon extension
 	app.ApplyExtension(ext.DefaultFaviconExtension(app.Config.Ext.FavIcon))
 	// return cache if available (1000 objects, max 10 Mb)

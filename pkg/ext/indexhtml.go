@@ -14,15 +14,17 @@ type IndexHTML struct {
 // DefaultIndexFileExtension installs the extension where a default index file
 // is queried if not provided in the url
 // (e.g. http://abc instead of http://abc/efg.html).
-func DefaultIndexFileExtension(filename string) Extension {
+func DefaultIndexFileExtension(filenames ...string) Extension {
 	return func(c *Core) (string, error) {
-		if filename == "" {
-			filename = "index.html"
+		if len(filenames) == 0 {
+			filenames = []string{"index.html", "README.md", "index.htm"}
 		}
-		decorator := GetIndexFileDecorator(filename)
-		c.ApplyStatObject(decorator)
-		c.ApplyGetObject(decorator)
-		return fmt.Sprintf("default index file: %s", filename), nil
+		for _, filename := range filenames {
+			decorator := GetIndexFileDecorator(filename)
+			c.ApplyStatObject(decorator)
+			c.ApplyGetObject(decorator)
+		}
+		return fmt.Sprintf("default index files: %s", filenames), nil
 	}
 }
 
