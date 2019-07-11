@@ -41,8 +41,8 @@ EXT_FAVICON=assets/favicon.ico
 
 # if set, list the folders inside a folder
 EXT_LISTFOLDER=true
-# if set, list all objects inside a folder, otherwise only list folders
-EXT_LISTFOLDEROBJECTS=false
+# objects that match the glob expression will be listed. e.g. markdown files
+EXT_LISTFOLDEROBJECTS=*.md
 
 # if provided, renders any markdown resources as HTML with the template.
 # template MUST have a placeholder {{ .Content }}
@@ -73,7 +73,7 @@ EXT_MARKDOWNTEMPLATE=assets/md-template.html
         "favicon": "assets/favicon.ico",
         "markdowntemplate": "assets/md-template.html",
         "listfolder": true,
-        "listfolderobjects": false
+        "listfolderobjects": "*.md"
     }
 }
 ```
