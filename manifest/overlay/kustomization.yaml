@@ -127,6 +127,13 @@ vars:
     apiVersion: v1
   fieldref:
     fieldpath: data.EXT_BUCKETNAME
+- name: EXT_PREFIX
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.EXT_PREFIX
 - name: EXT_DEFAULTHTML
   objref:
     kind: ConfigMap

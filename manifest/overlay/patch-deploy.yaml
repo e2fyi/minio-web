@@ -29,6 +29,8 @@ spec:
             value: $(EXT_BUCKETNAME)
           - name: EXT_DEFAULTHTML
             value: $(EXT_DEFAULTHTML)
+          - name: EXT_PREFIX
+            value: $(EXT_PREFIX)
           - name: EXT_FAVICON
             value: $(EXT_FAVICON)
           - name: EXT_MARKDOWNTEMPLATE

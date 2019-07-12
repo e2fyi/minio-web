@@ -33,7 +33,9 @@ spec:
           - name: MINIO_REGION
             value: ap-southeast-1
           - name: EXT_BUCKETNAME
-            value: grab-ds-tmp
+            value: ""
+          - name: EXT_PREFIX
+            value: ""
           - name: EXT_DEFAULTHTML
             value: index.html
           - name: EXT_FAVICON
@@ -43,7 +45,7 @@ spec:
           - name: EXT_LISTFOLDER
             value: "true"
           - name: EXT_LISTFOLDEROBJECTS
-            value: "false"
+            value: "*.md"
         ports:
         - containerPort: 8080
         resources:
