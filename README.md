@@ -1,5 +1,5 @@
 # github.com/e2fyi/minio-web
-[![godoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square "godoc")](https://godoc.org/github.com/e2fyi/minio-web/pkg) [![dockerhub](https://img.shields.io/badge/dockerhub-e2fyi%2Fminio--web-5272B4.svg?style=flat-square "dockerhub")](https://hub.docker.com/r/e2fyi/minio-web)
+[![godoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square "godoc")](https://godoc.org/github.com/e2fyi/minio-web/pkg) [![dockerhub](https://img.shields.io/badge/dockerhub-e2fyi%2Fminio--web-5272B4.svg?style=flat-square "dockerhub")](https://hub.docker.com/r/e2fyi/minio-web) ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/e2fyi/minio-web.svg?style=flat-square)
 
 A web server proxy for any S3-compatible storage.
 
