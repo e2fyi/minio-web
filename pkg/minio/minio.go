@@ -14,6 +14,7 @@ import (
 type Helper struct {
 	Client      *minio.Client
 	BucketName  string
+	Prefix      string
 	maxAttempts int
 }
 
@@ -27,13 +28,13 @@ type Config struct {
 }
 
 // NewMinioHelperWithBucket creates a new minio.Helper object.
-func NewMinioHelperWithBucket(config Config, bucketName string, maxAttempts int) (Helper, error) {
+func NewMinioHelperWithBucket(config Config, bucketName string, prefix string, maxAttempts int) (Helper, error) {
 	// create client
 	client, err := NewMinioClient(config)
 	if err != nil {
 		return Helper{}, err
 	}
-	return Helper{Client: client, BucketName: bucketName, maxAttempts: maxAttempts}, nil
+	return Helper{Client: client, BucketName: bucketName, Prefix: prefix, maxAttempts: maxAttempts}, nil
 }
 
 // NewMinioClient creates a new minio client. If accesskey and secretkey are
@@ -69,7 +70,7 @@ func minioObjectInfoToResourceInfo(info minio.ObjectInfo) ResourceInfo {
 		ContentType:  info.ContentType}
 }
 
-// test connection to backend
+// TestConnection test connection to backend
 func (h *Helper) TestConnection() (string, error) {
 	// test connection
 	if h.BucketName != "" {
@@ -83,9 +84,11 @@ func (h *Helper) TestConnection() (string, error) {
 
 // GetBucketNameAndPrefix infers the bucket name and prefix from the url.
 func (h *Helper) GetBucketNameAndPrefix(url string) (bucketname string, prefix string) {
+	// remove absolute reference
 	if url[0] == '/' {
 		url = url[1:]
 	}
+	// infer bucketname
 	if h.BucketName == "" {
 		parts := strings.Split(url, "/")
 		switch numParts := len(parts); {
@@ -104,28 +107,41 @@ func (h *Helper) GetBucketNameAndPrefix(url string) (bucketname string, prefix s
 func (h *Helper) GetObject(url string) (Resource, error) {
 	bucketName, prefix := h.GetBucketNameAndPrefix(url)
 	if bucketName == "" {
-		return Resource{}, errors.New("No bucket provided")
+		return Resource{Msg: fmt.Sprintf("GET[%s]: Bucket name not known", url)}, errors.New("Bucket name not known")
 	}
+	// add user provided prefix if any
+	prefix = h.Prefix + prefix
+	// get obj info
 	info, err := h.Client.StatObject(bucketName, prefix, minio.StatObjectOptions{})
 	if err != nil {
-		return Resource{}, err
+		return Resource{Msg: fmt.Sprintf("GET[%s] -> GetObject[%s/%s]: %v", url, bucketName, prefix, err)}, err
 	}
+	// get obj
 	obj, err := h.Client.GetObject(bucketName, prefix, minio.GetObjectOptions{})
 	if err != nil {
 		return Resource{}, err
 	}
-	return Resource{Data: obj, Info: minioObjectInfoToResourceInfo(info)}, nil
+	return Resource{
+		Data: obj,
+		Info: minioObjectInfoToResourceInfo(info),
+		Msg:  fmt.Sprintf("GET[%s] -> GetObject[%s/%s] ok", url, bucketName, prefix)}, nil
 }
 
 // StatObject retrieves the metadata (only) from a S3 compatible backend.
 func (h *Helper) StatObject(url string) (Resource, error) {
 	bucketName, prefix := h.GetBucketNameAndPrefix(url)
 	if bucketName == "" {
-		return Resource{}, errors.New("No bucket provided")
+		return Resource{Msg: fmt.Sprintf("StatObject[%s]: Bucket name not known", url)}, errors.New("Bucket name not known")
 	}
+	// add user provided prefix if any
+	prefix = h.Prefix + prefix
+	// get obj info
 	info, err := h.Client.StatObject(bucketName, prefix, minio.StatObjectOptions{})
 	if err != nil {
-		return Resource{}, err
+		return Resource{Msg: fmt.Sprintf("StatObject[%s/%s]: %v", bucketName, prefix, err)}, err
 	}
-	return Resource{Data: io.Reader(nil), Info: minioObjectInfoToResourceInfo(info)}, nil
+	return Resource{
+		Data: io.Reader(nil),
+		Info: minioObjectInfoToResourceInfo(info),
+		Msg:  fmt.Sprintf("StatObject[%s/%s] ok", bucketName, prefix)}, nil
 }

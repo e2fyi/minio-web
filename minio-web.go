@@ -12,7 +12,7 @@ func main() {
 	// create new app and load config
 	app := app.NewApp().LoadConfig()
 	// config backend
-	app.ConfigMinioHelper(app.Config.Minio, app.Config.Ext.BucketName)
+	app.ConfigMinioHelper(app.Config.Minio, app.Config.Ext.BucketName, app.Config.Ext.Prefix)
 	// install default index file extension
 	app.ApplyExtension(ext.DefaultIndexFileExtension(app.Config.Ext.DefaultHTMLs...))
 	// install default favicon extension

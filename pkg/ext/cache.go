@@ -3,8 +3,8 @@ package ext
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"time"
 
 	"github.com/bluele/gcache"
@@ -88,8 +88,7 @@ func (h *Cache) getObjectCache(GetObject Handler) Handler {
 		if h.cache.Has(url) {
 			unknown, err := h.cache.Get(url)
 			if err == nil {
-				log.Printf("loading %s from cache.", url)
-				res := Resource{}
+				res := Resource{Msg: fmt.Sprintf("Cache[%s] retrieve ok", url)}
 				data, ok := unknown.([]byte)
 				if ok {
 					fromGob(&res, data)
@@ -108,9 +107,9 @@ func (h *Cache) getObjectCache(GetObject Handler) Handler {
 			serialized, err := toGob(&res)
 			if err == nil {
 				h.cache.SetWithExpire(url, serialized, 5*time.Minute)
-				log.Printf("saving to %s cache.", url)
+				res.Msg = fmt.Sprintf("Cache[%s] cached ok", url)
 			} else {
-				log.Printf("Unable to serialize resource[%s]: %s", url, err.Error())
+				res.Msg = fmt.Sprintf("Cache[%s] serialization failed: %v", url, err)
 			}
 		}
 		return res, nil

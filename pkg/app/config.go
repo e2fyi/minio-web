@@ -31,6 +31,7 @@ type SSLConfig struct {
 // ExtensionsConfig is used to config the extensions to install on minio-web.
 type ExtensionsConfig struct {
 	BucketName        string `json:"bucketname"`
+	Prefix            string `json:"prefix"`
 	DefaultHTML       string `json:"defaulthtml"`
 	DefaultHTMLs      []string
 	FavIcon           string `json:"favicon"`

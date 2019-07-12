@@ -34,9 +34,9 @@ func (app *App) LoadConfig() *App {
 
 // ConfigMinioHelper creates a internal helper to interact with the S3
 // compatible backend.
-func (app *App) ConfigMinioHelper(config MinioConfig, bucketName string) *App {
+func (app *App) ConfigMinioHelper(config MinioConfig, bucketName string, prefix string) *App {
 
-	helper, err := minio.NewMinioHelperWithBucket(config, bucketName, 5)
+	helper, err := minio.NewMinioHelperWithBucket(config, bucketName, prefix, 5)
 	if err != nil {
 		app.Sugar.Fatal(err)
 	}
@@ -48,6 +48,7 @@ func (app *App) ConfigMinioHelper(config MinioConfig, bucketName string) *App {
 		msg, err := helper.TestConnection()
 		if err == nil {
 			app.Sugar.Info(msg)
+			app.Sugar.Infof("object prefix: %s", prefix)
 			break
 		}
 

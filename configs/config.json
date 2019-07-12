@@ -15,6 +15,7 @@
     },
     "ext": {
         "bucketname": "",
+        "prefix": "",
         "defaulthtml": "index.html,README.md",
         "favicon": "assets/favicon.ico",
         "markdowntemplate": "assets/md-template.html",

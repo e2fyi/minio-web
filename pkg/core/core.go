@@ -6,15 +6,20 @@ import (
 
 // Core describes the state of application
 type Core struct {
-	Sugar    *zap.SugaredLogger
 	handlers *HandlersToUse
 	Handlers
+	Sugared
 }
 
 // HandlersToUse describes the types of handlers.
 type HandlersToUse struct {
 	StatObjects []Handler
 	GetObjects  []Handler
+}
+
+// Sugared can be used to composite other object witj a sugared logger
+type Sugared struct {
+	Sugar *zap.SugaredLogger
 }
 
 // Extension is a function that decorates a Core struct.
@@ -24,8 +29,9 @@ type Extension = func(*Core) (string, error)
 func NewCore() Core {
 	sugar := zap.NewExample().Sugar()
 	return Core{
-		Sugar: sugar,
+		Sugared: Sugared{Sugar: sugar},
 		Handlers: Handlers{
+			Sugared:    Sugared{Sugar: sugar},
 			Serve:      DefaultServe,
 			SetHeaders: SetDefaultHeaders},
 		handlers: &HandlersToUse{

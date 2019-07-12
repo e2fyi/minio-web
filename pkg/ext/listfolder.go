@@ -89,7 +89,7 @@ func (ext *ListFolderExt) ListObjectsAsMarkdown(url string) (Resource, error) {
 
 	bucketName, prefix := ext.helper.GetBucketNameAndPrefix(url)
 	if bucketName == "" {
-		return Resource{}, errors.New("No bucket provided")
+		return Resource{Msg: fmt.Sprintf("GET[%s]: Bucket name not known", url)}, errors.New("Bucket name not known")
 	}
 
 	// Create a done channel to control 'ListObjectsV2' go routine.
@@ -97,6 +97,9 @@ func (ext *ListFolderExt) ListObjectsAsMarkdown(url string) (Resource, error) {
 
 	// Indicate to our routine to exit cleanly upon return.
 	defer close(doneCh)
+
+	// add user provided prefix if any
+	prefix = ext.helper.Prefix + prefix
 
 	// list folders inside folder
 	isRecursive := false
@@ -152,6 +155,7 @@ func (ext *ListFolderExt) ListObjectsAsMarkdown(url string) (Resource, error) {
 	}
 
 	return Resource{
+		Msg:  fmt.Sprintf("ListObjectsV2[%s/%s] ok", bucketName, prefix),
 		Data: bytes.NewReader(renderedMarkdown.Bytes()),
 		Info: ResourceInfo{
 			Size:         int64(len(renderedMarkdown.Bytes())),

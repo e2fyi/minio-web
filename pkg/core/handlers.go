@@ -2,7 +2,6 @@ package core
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -21,6 +20,7 @@ type ResourceInfo struct {
 type Resource struct {
 	Data io.Reader
 	Info ResourceInfo
+	Msg  string
 }
 
 // Handlers describes how to get Resource metadata, retrieve Resource from
@@ -32,6 +32,7 @@ type Handlers struct {
 	ListFolder func(url string) (Resource, error)
 	SetHeaders func(w http.ResponseWriter, info ResourceInfo)
 	Serve      func(w http.ResponseWriter, r Resource) error
+	Sugared
 }
 
 // Handler is a returns a Resource with a provided url.
@@ -91,8 +92,11 @@ func (h *Handlers) Handler() func(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) HeadHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path
 	res, err := h.StatObject(url)
+	if res.Msg != "" {
+		h.Sugar.Info(res.Msg)
+	}
 	if err != nil {
-		log.Printf("HEAD[%s]: %s", url, err.Error())
+		h.Sugar.Errorf("HEAD[%s] [404]: %s", url, err.Error())
 		w.WriteHeader(404)
 		return
 	}
@@ -104,17 +108,25 @@ func (h *Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Path
 
 	res, err := h.GetObject(url)
+	if res.Msg != "" {
+		h.Sugar.Info(res.Msg)
+	}
 	if err != nil {
-		log.Printf("GET %s: %s", url, err)
+		h.Sugar.Errorf("GET[%s] [404]: %s", url, err)
 		w.WriteHeader(404)
 		return
 	}
 
 	h.SetHeaders(w, res.Info)
 	err = h.Serve(w, res)
+	if res.Msg != "" {
+		h.Sugar.Info(res.Msg)
+	}
 	if err != nil {
-		log.Printf("Serve: %s", err)
+		h.Sugar.Errorf("Serve[%s] [500]: %s", url, err)
 		w.Header().Set("Status-Code", "500")
 		w.Write([]byte(err.Error()))
+		return
 	}
+	h.Sugar.Infof("GET[%s] [200]: ok", res.Info.Key)
 }

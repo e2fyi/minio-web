@@ -32,6 +32,11 @@ MINIO_REGION=
 # if not provided (http://minio-web/abc/efg => endpoint/abc/efg) where abc is the bucket
 EXT_BUCKETNAME=
 
+# prefix to add to query. 
+# e.g. EXT_PREFIX=foo/
+# query to endpoint/abc -> query EXT_BUCKETNAME/foo/ab
+EXT_PREFIX=
+
 # if provided a list of default index files to return 
 # i.e http://minio-web/abc/ => http://minio-web/abc/index.html
 EXT_DEFAULTHTML=index.html,README.md
