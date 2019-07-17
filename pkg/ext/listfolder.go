@@ -87,6 +87,14 @@ func NewListFolderExt(helper *MinioHelper, listFolder bool, listFolderObjects st
 // and rendered them as markdown Resource.
 func (ext *ListFolderExt) ListObjectsAsMarkdown(url string) (Resource, error) {
 
+	// normalize url to directory
+	switch n := len(url); {
+	case n == 0:
+		url = "/"
+	case url[n-1] != '/':
+		url = url + "/"
+	}
+
 	bucketName, prefix := ext.helper.GetBucketNameAndPrefix(url)
 	if bucketName == "" {
 		return Resource{Msg: fmt.Sprintf("GET[%s]: Bucket name not known", url)}, errors.New("Bucket name not known")
@@ -108,6 +116,11 @@ func (ext *ListFolderExt) ListObjectsAsMarkdown(url string) (Resource, error) {
 	for info := range objectCh {
 		// get actual filename
 		name := strings.Replace(info.Key, prefix, "", 1)
+
+		// in case of errors
+		if len(name) <= 0 {
+			continue
+		}
 
 		// filter hidden files
 		if name[0] == '.' {
@@ -138,7 +151,7 @@ func (ext *ListFolderExt) ListObjectsAsMarkdown(url string) (Resource, error) {
 		items = append(items,
 			listingItem{
 				Name:         name,
-				Path:         name,
+				Path:         url + name,
 				Size:         size,
 				LastModified: lastModified})
 	}

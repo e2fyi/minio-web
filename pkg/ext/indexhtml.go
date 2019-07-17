@@ -8,7 +8,7 @@ import (
 // IndexHTML provides the decorator to insert a default index file to any
 // requests.
 type IndexHTML struct {
-	filename string
+	filenames []string
 }
 
 // DefaultIndexFileExtension installs the extension where a default index file
@@ -19,38 +19,41 @@ func DefaultIndexFileExtension(filenames ...string) Extension {
 		if len(filenames) == 0 {
 			filenames = []string{"index.html", "README.md", "index.htm"}
 		}
-		for _, filename := range filenames {
-			decorator := GetIndexFileDecorator(filename)
-			c.ApplyStatObject(decorator)
-			c.ApplyGetObject(decorator)
-		}
+		decorator := GetIndexFileDecorator(filenames)
+		c.ApplyStatObject(decorator)
+		c.ApplyGetObject(decorator)
 		return fmt.Sprintf("default index files: %s", filenames), nil
 	}
 }
 
 // GetIndexFileDecorator installs the extension where a default index file is queried
 // if not provided in the url (e.g. http://abc instead of http://abc/efg.html).
-func GetIndexFileDecorator(filename string) HandlerDecorator {
-	if filename == "" {
-		filename = "index.html"
-	}
-	ext := IndexHTML{filename: filename}
+func GetIndexFileDecorator(filenames []string) HandlerDecorator {
+	ext := IndexHTML{filenames: filenames}
 	return ext.GetIndexHTML
 }
 
 // insertIfNeeded inserts the default index file into the url if needed (e.g.
 // Directory request).
-func (i IndexHTML) insertIfNeeded(url string) (updatedURL string, unchanged bool) {
+func (i IndexHTML) getPotentialUrls(url string) []string {
+	var urlCandidates = []string{}
 	switch n := len(url); {
 	case n == 0:
-		return i.filename, false
 	case n == 1 && url[0] == '/':
-		return i.filename, false
+		for _, filename := range i.filenames {
+			urlCandidates = append(urlCandidates, filename)
+		}
 	case url[n-1] == '/':
-		return path.Join(url, i.filename), false
+		for _, filename := range i.filenames {
+			urlCandidates = append(urlCandidates, path.Join(url, filename))
+		}
 	default:
-		return url, true
+		urlCandidates = append(urlCandidates, url)
+		for _, filename := range i.filenames {
+			urlCandidates = append(urlCandidates, path.Join(url, filename))
+		}
 	}
+	return urlCandidates
 }
 
 // GetIndexHTML decorates a GetObject or StatObject function to insert the
@@ -58,11 +61,17 @@ func (i IndexHTML) insertIfNeeded(url string) (updatedURL string, unchanged bool
 func (i IndexHTML) GetIndexHTML(handler Handler) Handler {
 
 	return func(url string) (Resource, error) {
-		updatedURL, unchanged := i.insertIfNeeded(url)
-		resource, error := handler(updatedURL)
-		if error != nil && unchanged {
-			return handler(path.Join(url, i.filename))
+		var resource Resource
+		var error error
+
+		urls := i.getPotentialUrls(url)
+
+		for _, urlCandidate := range urls {
+			resource, error = handler(urlCandidate)
+			if error == nil {
+				return resource, nil
+			}
 		}
-		return resource, error
+		return Resource{}, error
 	}
 }
