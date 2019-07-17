@@ -169,3 +169,17 @@ vars:
     apiVersion: v1
   fieldref:
     fieldpath: data.EXT_LISTFOLDEROBJECTS    
+- name: AWS_METADATA_SERVICE_TIMEOUT
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.AWS_METADATA_SERVICE_TIMEOUT    
+- name: AWS_METADATA_SERVICE_NUM_ATTEMPTS
+  objref:
+    kind: ConfigMap
+    name: minio-web-params
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.AWS_METADATA_SERVICE_NUM_ATTEMPTS    
