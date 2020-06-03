@@ -4,6 +4,9 @@ go 1.12
 
 replace github.com/testcontainers/testcontainer-go => github.com/testcontainers/testcontainers-go v0.0.3
 
+// see https://github.com/Azure/go-autorest/issues/449
+replace github.com/census-instrumentation/opencensus-proto v0.1.0-0.20181214143942-ba49f56771b8 => github.com/census-instrumentation/opencensus-proto v0.0.3-0.20181214143942-ba49f56771b8
+
 // -20190108154635-e99af5d43a04
 // e99af5d43a047907825b8231e080e39665aef867
 // 47c0da630f72
@@ -13,6 +16,8 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/go-ini/ini v1.42.0 // indirect
 	github.com/gobwas/glob v0.2.3
+	github.com/gorilla/pat v1.0.1
+	github.com/markbates/goth v1.56.0
 	github.com/micro/go-config v1.1.0
 	github.com/micro/go-micro v1.7.0
 	github.com/minio/minio-go v6.0.14+incompatible
