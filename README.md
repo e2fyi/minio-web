@@ -1,5 +1,6 @@
 # github.com/e2fyi/minio-web
 [![godoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square "godoc")](https://godoc.org/github.com/e2fyi/minio-web/pkg) [![dockerhub](https://img.shields.io/badge/dockerhub-e2fyi%2Fminio--web-5272B4.svg?style=flat-square "dockerhub")](https://hub.docker.com/r/e2fyi/minio-web) ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/e2fyi/minio-web.svg?style=flat-square)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fe2fyi%2Fminio-web.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fe2fyi%2Fminio-web?ref=badge_shield)
 
 A web server proxy for any S3-compatible storage.
 
@@ -125,3 +126,7 @@ docker run --rm -ti \
 - [github.com/e2fyi/minio-web/pkg/core](https://godoc.org/github.com/e2fyi/minio-web/pkg/core)
 - [github.com/e2fyi/minio-web/pkg/minio](https://godoc.org/github.com/e2fyi/minio-web/pkg/minio)
 - [github.com/e2fyi/minio-web/pkg/ext](https://godoc.org/github.com/e2fyi/minio-web/pkg/ext)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fe2fyi%2Fminio-web.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fe2fyi%2Fminio-web?ref=badge_large)
