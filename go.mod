@@ -1,6 +1,6 @@
 module github.com/e2fyi/minio-web
 
-go 1.12
+go 1.14
 
 replace github.com/testcontainers/testcontainer-go => github.com/testcontainers/testcontainers-go v0.0.3
 

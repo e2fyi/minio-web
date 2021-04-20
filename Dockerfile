@@ -1,5 +1,5 @@
 #################################
-FROM golang:1.12-alpine as builder
+FROM golang:1.14-alpine as builder
 
 WORKDIR /goapp
 
@@ -21,7 +21,7 @@ COPY assets/ assets/
 COPY configs/config.json config.json
 
 ENV CONFIG_FILE_PATH="/goapp/config.json"
-EXPOSE 8080 
+EXPOSE 8080
 
 ENTRYPOINT [ "su-exec", "goapp:1000" ]
 
