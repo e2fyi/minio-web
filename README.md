@@ -107,6 +107,11 @@ docker-compose up -d
 
 ### Docker image
 
+Because of the [pull limits](https://www.docker.com/blog/scaling-docker-to-serve-millions-more-developers-network-egress/) by Dockerhub, image will now available in both [Dockerhub](https://hub.docker.com/r/e2fyi/minio-web) and [Quay.io](https://quay.io/repository/e2fyi/minio-web).
+
+- `e2fyi/minio-web:<tag>`
+- `quay.io/e2fyi/minio-web:<tag>`
+
 ```bash
 # build locally
 docker build -t e2fyi/minio-web:latest .
