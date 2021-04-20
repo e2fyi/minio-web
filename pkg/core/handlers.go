@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"time"
+	"strconv"
 )
 
 // ResourceInfo describes the metadata of the resource.
@@ -58,7 +59,7 @@ func SetDefaultHeaders(w http.ResponseWriter, info ResourceInfo) {
 	w.Header().Set("Content-Type", info.ContentType)
 	w.Header().Set("ETag", info.ETag)
 	w.Header().Set("Last-Modified", info.LastModified.Format(time.RFC1123))
-	w.Header().Set("Size", string(info.Size))
+	w.Header().Set("Content-Length", strconv.FormatInt(info.Size, 10))
 }
 
 // DefaultServe serve the Resource.
