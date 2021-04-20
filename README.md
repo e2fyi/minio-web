@@ -1,5 +1,9 @@
 # github.com/e2fyi/minio-web
-[![godoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square "godoc")](https://godoc.org/github.com/e2fyi/minio-web/pkg) [![dockerhub](https://img.shields.io/badge/dockerhub-e2fyi%2Fminio--web-5272B4.svg?style=flat-square "dockerhub")](https://hub.docker.com/r/e2fyi/minio-web) ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/e2fyi/minio-web.svg?style=flat-square)
+
+[![godoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square "godoc")](https://godoc.org/github.com/e2fyi/minio-web/pkg)
+[![dockerhub](https://img.shields.io/badge/dockerhub-e2fyi%2Fminio--web-5272B4.svg?style=flat-square "dockerhub")](https://hub.docker.com/r/e2fyi/minio-web)
+[![Docker Repository on Quay](https://quay.io/repository/e2fyi/minio-web/status "Docker Repository on Quay")](https://quay.io/repository/e2fyi/minio-web)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/e2fyi/minio-web.svg?style=flat-square)
 
 A web server proxy for any S3-compatible storage.
 
@@ -32,12 +36,12 @@ MINIO_REGION=
 # if not provided (http://minio-web/abc/efg => endpoint/abc/efg) where abc is the bucket
 EXT_BUCKETNAME=
 
-# prefix to add to query. 
+# prefix to add to query.
 # e.g. EXT_PREFIX=foo/
 # query to endpoint/abc -> query EXT_BUCKETNAME/foo/ab
 EXT_PREFIX=
 
-# if provided a list of default index files to return 
+# if provided a list of default index files to return
 # i.e http://minio-web/abc/ => http://minio-web/abc/index.html
 EXT_DEFAULTHTML=index.html,README.md
 
@@ -58,32 +62,33 @@ EXT_MARKDOWNTEMPLATE=assets/md-template.html
 
 ```json
 {
-    "server": {
-        "port": 8080,
-        "ssl": {
-            "cert": "",
-            "key": ""
-        }
-    },
-    "minio": {
-        "endpoint": "s3.amazonaws.com",
-        "accesskey": "",
-        "secretkey": "",
-        "secure": false ,
-        "region": ""       
-    },
-    "ext": {
-        "bucketname": "",
-        "defaulthtml": "index.html,README.md",
-        "favicon": "assets/favicon.ico",
-        "markdowntemplate": "assets/md-template.html",
-        "listfolder": true,
-        "listfolderobjects": "*.{md,html,jpg,jpeg,png,txt}"
+  "server": {
+    "port": 8080,
+    "ssl": {
+      "cert": "",
+      "key": ""
     }
+  },
+  "minio": {
+    "endpoint": "s3.amazonaws.com",
+    "accesskey": "",
+    "secretkey": "",
+    "secure": false,
+    "region": ""
+  },
+  "ext": {
+    "bucketname": "",
+    "defaulthtml": "index.html,README.md",
+    "favicon": "assets/favicon.ico",
+    "markdowntemplate": "assets/md-template.html",
+    "listfolder": true,
+    "listfolderobjects": "*.{md,html,jpg,jpeg,png,txt}"
+  }
 }
 ```
 
 ### Run demo locally
+
 ```bash
 # starts a minio server
 ./scripts/start-minio-server.sh
@@ -93,6 +98,7 @@ go run .
 ```
 
 Alternatively, with docker compose:
+
 ```bash
 # you can access the minio-store at localhost:9000
 # and the minio-web at localhost:8080
@@ -100,6 +106,7 @@ docker-compose up -d
 ```
 
 ### Docker image
+
 ```bash
 # build locally
 docker build -t e2fyi/minio-web:latest .
@@ -115,7 +122,8 @@ docker run --rm -ti \
 ```
 
 ## Kubernetes deployment (Kustomize)
-[kustomize](https://github.com/kubernetes-sigs/kustomize) k8s manifest for 
+
+[kustomize](https://github.com/kubernetes-sigs/kustomize) k8s manifest for
 `minio-web` can be found in [manifest/](./manifest).
 
 ## GoDoc
