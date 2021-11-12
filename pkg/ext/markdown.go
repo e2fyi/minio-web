@@ -81,7 +81,7 @@ func (m Markdown) RenderMarkdown(Serve ServeHandler) ServeHandler {
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Header().Set("Content-Length", strconv.FormatInt(int64(len(buf.Bytes())), 10))
-		w.Write(buf.Bytes())
-		return Serve(w, resource)
+		_, err = w.Write(buf.Bytes())
+		return err
 	}
 }
