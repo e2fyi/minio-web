@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"gitlab.com/golang-commonmark/markdown"
@@ -73,13 +74,14 @@ func (m Markdown) RenderMarkdown(Serve ServeHandler) ServeHandler {
 		}
 
 		rendered := m.md.RenderToString(content)
-		resource.Info.Size = int64(len(rendered))
-
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = m.template.Execute(w, TemplateData{Content: template.HTML(rendered)})
+		var buf bytes.Buffer
+		err = m.template.Execute(&buf, TemplateData{Content: template.HTML(rendered)})
 		if err != nil {
-			return Serve(w, resource)
+			return err
 		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Content-Length", strconv.FormatInt(int64(len(buf.Bytes())), 10))
+		_, err = w.Write(buf.Bytes())
 		return err
 	}
 }

@@ -4,9 +4,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/micro/go-micro/config"
-	"github.com/micro/go-micro/config/source/env"
-	"github.com/micro/go-micro/config/source/file"
+	"go-micro.dev/v4/config"
+	"go-micro.dev/v4/config/source/env"
+	"go-micro.dev/v4/config/source/file"
 )
 
 // Configuration is global configuration object.
@@ -53,13 +53,19 @@ func configFilePath() string {
 // LoadConfig loads the config from both file and environment variables.
 func LoadConfig() (Configuration, error) {
 	// load from file
-	conf := config.NewConfig()
-	err := conf.Load(
+	conf, err := config.NewConfig()
+	if err != nil {
+		return Configuration{}, err
+	}
+	err = conf.Load(
 		file.NewSource(
 			file.WithPath(configFilePath()),
 		),
 		env.NewSource(),
 	)
+	if err != nil {
+		return Configuration{}, err
+	}
 	var configuration Configuration
 	err = conf.Scan(&configuration)
 	if err != nil {

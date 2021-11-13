@@ -3,8 +3,8 @@ package core
 import (
 	"io"
 	"net/http"
-	"time"
 	"strconv"
+	"time"
 )
 
 // ResourceInfo describes the metadata of the resource.
