@@ -112,6 +112,10 @@ Because of the [pull limits](https://www.docker.com/blog/scaling-docker-to-serve
 - `e2fyi/minio-web:<tag>`
 - `quay.io/e2fyi/minio-web:<tag>`
 
+> Free tier for docker hub automated build has been [discontinued](https://www.docker.com/blog/changes-to-docker-hub-autobuilds/).
+> Until I find time to setup GitHub actions, no new tags will be pushed to docker hub.
+> i.e. All the latest releases can only be found in Quay.io
+
 ```bash
 # build locally
 docker build -t e2fyi/minio-web:latest .
