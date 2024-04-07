@@ -68,7 +68,9 @@ func (ext *ListFolderExt) decorateListFolderHandler(handler Handler) Handler {
 // NewListFolderExt creates a new ListFolderExt object.
 func NewListFolderExt(helper *MinioHelper, listFolder bool, listFolderObjects string) (*ListFolderExt, error) {
 	if !listFolder {
-		return &ListFolderExt{listFolder: listFolder}, nil
+		return &ListFolderExt{
+			helper:     helper,
+			listFolder: listFolder}, nil
 	}
 	listFolderTemplate, err := template.New("listing").Parse(listingTemplate)
 
@@ -86,7 +88,9 @@ func NewListFolderExt(helper *MinioHelper, listFolder bool, listFolderObjects st
 // ListObjectsAsMarkdown retrieves (non-recursive) objects with a specified prefix
 // and rendered them as markdown Resource.
 func (ext *ListFolderExt) ListObjectsAsMarkdown(url string) (Resource, error) {
-
+	if !ext.listFolder {
+		return Resource{}, nil
+	}
 	// normalize url to directory
 	switch n := len(url); {
 	case n == 0:
