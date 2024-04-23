@@ -107,14 +107,15 @@ docker-compose up -d
 
 ### Docker image
 
-Because of the [pull limits](https://www.docker.com/blog/scaling-docker-to-serve-millions-more-developers-network-egress/) by Dockerhub, image will now available in both [Dockerhub](https://hub.docker.com/r/e2fyi/minio-web) and [Quay.io](https://quay.io/repository/e2fyi/minio-web).
+Image will now available in ~[Dockerhub](https://hub.docker.com/r/e2fyi/minio-web)~, [Quay.io](https://quay.io/repository/e2fyi/minio-web) and [Github registry](https://github.com/e2fyi/minio-web/pkgs/container/minio-web).
 
-- `e2fyi/minio-web:<tag>`
+- ~`e2fyi/minio-web:<tag>`~
 - `quay.io/e2fyi/minio-web:<tag>`
+- `ghcr.io/e2fyi/minio-web:<tag>`
 
 > Free tier for docker hub automated build has been [discontinued](https://www.docker.com/blog/changes-to-docker-hub-autobuilds/).
 > Until I find time to setup GitHub actions, no new tags will be pushed to docker hub.
-> i.e. All the latest releases can only be found in Quay.io
+> i.e. All the latest releases can only be found in Quay.io and ghcr.io (thanks @PseudoResonance)
 
 ```bash
 # build locally
