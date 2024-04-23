@@ -64,6 +64,10 @@ func SetDefaultHeaders(w http.ResponseWriter, info ResourceInfo) {
 
 // DefaultServe serve the Resource.
 func DefaultServe(w http.ResponseWriter, r Resource) error {
+	if r.Data == nil {
+		w.WriteHeader(404)
+		return nil
+	}
 	_, err := io.Copy(w, r.Data)
 	return err
 }

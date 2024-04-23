@@ -85,7 +85,7 @@ func (h *Helper) TestConnection() (string, error) {
 // GetBucketNameAndPrefix infers the bucket name and prefix from the url.
 func (h *Helper) GetBucketNameAndPrefix(url string) (bucketname string, prefix string) {
 	// remove absolute reference
-	if url[0] == '/' {
+	if len(url) > 0 && url[0] == '/' {
 		url = url[1:]
 	}
 	// infer bucketname
